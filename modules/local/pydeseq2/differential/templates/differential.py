@@ -2,6 +2,7 @@
 
 import platform
 import re
+import sys
 from pathlib import Path
 
 import anndata as ad
@@ -117,7 +118,17 @@ for celltype, celltype_data in adata.obs.groupby("celltype", observed=True):
         columns=sub.var_names,
     )
 
-    design_factors = ["donor", "condition"] if donors_span_conditions(metadata) else ["condition"]
+    paired = donors_span_conditions(metadata)
+    design_factors = ["donor", "condition"] if paired else ["condition"]
+    n_coefficients = len(conditions) + (len(donors) - 1 if paired else 0)
+    # DESeq2 cannot estimate dispersion without residual degrees of freedom
+    if len(metadata) <= n_coefficients:
+        print(
+            f"Skipping cell type '{celltype}': {len(metadata)} pseudobulk samples for "
+            f"{n_coefficients} design coefficients, no replicates to estimate dispersion",
+            file=sys.stderr,
+        )
+        continue
 
     dds = DeseqDataSet(
         counts=counts_df,

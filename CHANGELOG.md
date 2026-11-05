@@ -9,6 +9,9 @@ Initial release of nf-core/scdownstream, created with the [nf-core](https://nf-c
 
 ### `Changed`
 
+- Pin `mudata`, `numba`, `decoupler-py` and `python` in the `LIANA_BYSAMPLE`, `LIANA_RANKAGGREGATE` and `CELL2CELL_TENSOR` Conda recipes to the versions in their container lock files, so that `-profile conda` no longer resolves a `mudata` that fails to import `pydantic` and `scverse_misc.Settings`, by Duy Pham and Claude Opus 5.5.
+- Skip cell types without residual degrees of freedom in `PYDESEQ2_DIFFERENTIAL` and `EDGEPYTHON_DIFFERENTIAL` instead of failing the task on dispersion estimation, by Duy Pham and Claude Opus 5.5.
+
 - Annotate SCimilarity predictions directly on the input AnnData without copying unrelated data, by @nictru and GPT-6.1 Sol [[#376](https://github.com/nf-core/scdownstream/pull/376)].
 - Gzip-compress H5AD outputs from the installed AnnData, CellBender, DoubletDetection, Scrublet, scAR and SOLO modules through tool-recorded patches, by @nictru and GPT-6.1 Sol [[#371](https://github.com/nf-core/scdownstream/pull/371)].
 - Type boolean and numeric parameters while retaining config defaults, and require Nextflow 26.04.6 or later, by @nictru and GPT-6.1 Sol [[#359](https://github.com/nf-core/scdownstream/pull/359)].

@@ -2,6 +2,7 @@
 
 import platform
 import re
+import sys
 from pathlib import Path
 
 import anndata as ad
@@ -137,6 +138,14 @@ for celltype, celltype_data in adata.obs.groupby("celltype", observed=True):
     # edgepython.model_matrix drops coefficient names; keep a patsy DataFrame for lookup.
     design_df = patsy.dmatrix(design_formula, data=metadata, return_type="dataframe")
     design = np.asarray(design_df, dtype=np.float64)
+    # Dispersion estimation needs residual degrees of freedom
+    if design.shape[0] <= design.shape[1]:
+        print(
+            f"Skipping cell type '{celltype}': {design.shape[0]} pseudobulk samples for "
+            f"{design.shape[1]} design coefficients, no replicates to estimate dispersion",
+            file=sys.stderr,
+        )
+        continue
     y = ep.make_dgelist(
         counts=counts,
         samples=metadata,
