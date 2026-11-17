@@ -14,6 +14,7 @@ Initial release of nf-core/scdownstream, created with the [nf-core](https://nf-c
 - Skip cell types without residual degrees of freedom in `PYDESEQ2_DIFFERENTIAL` and `EDGEPYTHON_DIFFERENTIAL` instead of failing the task on dispersion estimation, by Duy Pham and Claude Opus 5.5.
 - Raise `conda.createTimeout` to 2 h in the `conda` and `mamba` profiles, so that large Bioconductor environments such as `SCRAN_NORMALIZATION` are not killed mid-transaction on slow shared filesystems, by Duy Pham and Claude Opus 5.5.
 - Raise `apptainer.pullTimeout` and `singularity.pullTimeout` to 2 h in the `apptainer` and `singularity` profiles, so that large Seqera Containers images such as the one used by `DECOUPLER_NETWORK` are not killed mid-download, by Duy Pham and Claude Opus 5.5.
+- Run `ADATA_EXTEND` in the `pyarrow`-enabled `SCANPY_RANKGENESGROUPS` image and environment, so that the final extension step can unpickle Arrow-backed fragments from the differential expression and decoupler modules under container profiles, by Duy Pham and Claude Opus 5.5.
 
 - Annotate SCimilarity predictions directly on the input AnnData without copying unrelated data, by @nictru and GPT-6.1 Sol [[#376](https://github.com/nf-core/scdownstream/pull/376)].
 - Gzip-compress H5AD outputs from the installed AnnData, CellBender, DoubletDetection, Scrublet, scAR and SOLO modules through tool-recorded patches, by @nictru and GPT-6.1 Sol [[#371](https://github.com/nf-core/scdownstream/pull/371)].
