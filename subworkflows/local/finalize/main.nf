@@ -1,4 +1,4 @@
-include { ADATA_EXTEND        } from '../../../modules/local/adata/extend'
+include { ADATA_EXTEND_FINAL as ADATA_EXTEND } from '../../../modules/local/adata/extendfinal'
 include { ADATA_TORDS         } from '../../../modules/local/adata/tords'
 include { ADATA_PREPCELLXGENE } from '../../../modules/local/adata/prepcellxgene'
 
