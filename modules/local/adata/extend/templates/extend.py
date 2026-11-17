@@ -115,6 +115,39 @@ for path in layers_paths:
         layer = np.asarray(layer, dtype=np.float32)
     adata.layers[path.stem] = layer
 
+def is_nullable_string(dtype):
+    return isinstance(dtype, pd.StringDtype) or (isinstance(dtype, pd.ArrowDtype) and pd.api.types.is_string_dtype(dtype))
+
+
+def to_object_index(index):
+    return index.astype(object) if is_nullable_string(index.dtype) else index
+
+
+def legacy_strings(value):
+    # Fragments from pyarrow-enabled modules can carry nullable string arrays,
+    # which ANNDATA_ALLOW_WRITE_NULLABLE_STRINGS=0 refuses to write.
+    if isinstance(value, dict):
+        return {key: legacy_strings(item) for key, item in value.items()}
+    if isinstance(value, pd.DataFrame):
+        value = value.copy()
+        for column in value.columns:
+            series = value[column]
+            if is_nullable_string(series.dtype):
+                value[column] = series.astype(object).where(series.notna(), np.nan)
+            elif isinstance(series.dtype, pd.CategoricalDtype) and is_nullable_string(series.cat.categories.dtype):
+                value[column] = series.cat.rename_categories(series.cat.categories.astype(object))
+        value.index = to_object_index(value.index)
+        value.columns = to_object_index(value.columns)
+        return value
+    if isinstance(value, pd.Series):
+        return legacy_strings(value.to_frame()).iloc[:, 0]
+    return value
+
+
+adata.obs = legacy_strings(adata.obs)
+adata.var = legacy_strings(adata.var)
+adata.uns = legacy_strings(dict(adata.uns))
+
 adata.write_h5ad(f"{prefix}.h5ad", compression="gzip")
 adata.obs.to_csv(f"{prefix}_metadata.csv")
 
